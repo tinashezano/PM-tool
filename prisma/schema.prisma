@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support in Prisma; stage/priority/source are
+// plain strings constrained in app code — see src/lib/constants.ts.
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  avatarColor String @default("#2F6F5A")
+  createdAt DateTime @default(now())
+
+  deals        Deal[]        @relation("DealOwner")
+  workItems    WorkItem[]    @relation("WorkItemAssignee")
+}
+
+model Deal {
+  id            String       @id @default(cuid())
+  title         String
+  companyName   String?
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  valueCents    Int          @default(0)
+  winProbability Int         @default(20)
+  priority      String       @default("low")
+  source        String       @default("manual")
+  stage         String       @default("new_enquiry")
+  stageOrder    Int          @default(0)
+  proposalCount Int          @default(0)
+  dueDate       DateTime?
+  notes         String?
+
+  ownerId       String?
+  owner         User?        @relation("DealOwner", fields: [ownerId], references: [id])
+
+  discoveryEventId   String?
+  discoveryMeetLink  String?
+  proposalUrl        String?
+  invoiceId          String?
+
+  client        Client?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([stage])
+}
+
+model Client {
+  id                   String   @id @default(cuid())
+  dealId               String?  @unique
+  deal                 Deal?    @relation(fields: [dealId], references: [id])
+  name                 String
+  billingContact       String?
+  quickbooksCustomerId String?
+  accountManagerId     String?
+  status               String   @default("active")
+  createdAt            DateTime @default(now())
+
+  workItems            WorkItem[]
+}
+
+model EngagementTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  serviceLine String
+  taskTitles  String
+  createdAt   DateTime @default(now())
+
+  workItems   WorkItem[]
+}
+
+model WorkItem {
+  id          String    @id @default(cuid())
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  templateId  String?
+  template    EngagementTemplate? @relation(fields: [templateId], references: [id])
+  title       String
+  status      String    @default("not_started")
+  dueDate     DateTime?
+  assigneeId  String?
+  assignee    User?     @relation("WorkItemAssignee", fields: [assigneeId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  tasks       Task[]
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  workItemId  String
+  workItem    WorkItem  @relation(fields: [workItemId], references: [id])
+  title       String
+  done        Boolean   @default(false)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model IntegrationEvent {
+  id              String   @id @default(cuid())
+  source          String
+  eventType       String
+  payload         String
+  receivedAt      DateTime @default(now())
+  processedStatus String   @default("received")
+}
