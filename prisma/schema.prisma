@@ -12,14 +12,58 @@ datasource db {
 // new stage/priority value never needs a migration.
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  avatarColor String @default("#2F6F5A")
-  createdAt DateTime @default(now())
+  id          String    @id @default(cuid())
+  name        String
+  email       String    @unique
+  avatarColor String    @default("#2F6F5A")
+  role        String    @default("staff")
+  status      String    @default("active")
+  startDate   DateTime?
+  managerId   String?
+  manager     User?     @relation("Manager", fields: [managerId], references: [id])
+  reports     User[]    @relation("Manager")
+  createdAt   DateTime  @default(now())
 
-  deals        Deal[]        @relation("DealOwner")
-  workItems    WorkItem[]    @relation("WorkItemAssignee")
+  deals            Deal[]           @relation("DealOwner")
+  workItems        WorkItem[]       @relation("WorkItemAssignee")
+  sops             Sop[]            @relation("SopOwner")
+  onboardingTasks  OnboardingTask[] @relation("OnboardingAssignee")
+}
+
+model Sop {
+  id        String   @id @default(cuid())
+  title     String
+  category  String
+  summary   String?
+  content   String
+  status    String   @default("published")
+  ownerId   String?
+  owner     User?    @relation("SopOwner", fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
+model OnboardingTemplate {
+  id         String           @id @default(cuid())
+  name       String
+  taskTitles String
+  createdAt  DateTime         @default(now())
+
+  tasks      OnboardingTask[]
+}
+
+model OnboardingTask {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("OnboardingAssignee", fields: [userId], references: [id])
+  templateId  String?
+  template    OnboardingTemplate? @relation(fields: [templateId], references: [id])
+  title       String
+  done        Boolean   @default(false)
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 model Deal {

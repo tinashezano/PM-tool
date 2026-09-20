@@ -40,6 +40,33 @@ export const DEAL_SOURCES: { id: DealSource; label: string }[] = [
   { id: "other", label: "Other" },
 ];
 
+export const SOP_CATEGORIES = [
+  "Client Onboarding",
+  "Compliance & Tax",
+  "Bookkeeping",
+  "Billing & Collections",
+  "IT & Security",
+  "HR & People",
+] as const;
+
+export type EmployeeRole = "partner" | "account_manager" | "staff" | "admin";
+
+export const EMPLOYEE_ROLES: { id: EmployeeRole; label: string }[] = [
+  { id: "partner", label: "Partner" },
+  { id: "account_manager", label: "Account Manager" },
+  { id: "staff", label: "Staff Accountant" },
+  { id: "admin", label: "Admin" },
+];
+
+export type EmployeeStatus = "invited" | "onboarding" | "active" | "offboarded";
+
+export const EMPLOYEE_STATUSES: { id: EmployeeStatus; label: string }[] = [
+  { id: "invited", label: "Invited" },
+  { id: "onboarding", label: "Onboarding" },
+  { id: "active", label: "Active" },
+  { id: "offboarded", label: "Offboarded" },
+];
+
 export function formatCurrency(cents: number): string {
   return new Intl.NumberFormat("en-AU", {
     style: "currency",

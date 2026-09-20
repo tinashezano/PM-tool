@@ -20,6 +20,9 @@ import {
   FileStack,
   Calendar,
   Link2,
+  BookOpen,
+  Users2,
+  UserPlus,
 } from "lucide-react";
 
 export type NavItem = {
@@ -82,6 +85,17 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Job Management", href: "/deliver/jobs", icon: Briefcase },
       { label: "Time tracker", href: "/deliver/time-tracker", icon: Clock },
       { label: "Docs", href: "/deliver/docs", icon: FileStack },
+    ],
+  },
+  {
+    label: "SOP Library",
+    items: [{ label: "All SOPs", href: "/sop-library", icon: BookOpen }],
+  },
+  {
+    label: "People & Onboarding",
+    items: [
+      { label: "Team Directory", href: "/people", icon: Users2 },
+      { label: "Onboarding", href: "/people/onboarding", icon: UserPlus },
     ],
   },
   {

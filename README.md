@@ -64,11 +64,23 @@ the deploy logs for the `prisma migrate deploy` step).
   between stages, search, and add a deal. Moving a deal into **Onboarding**
   automatically creates a **Client** record.
 - **`/clients`** — clients created from won deals.
+- **`/sop-library`** — searchable, categorized library of standard operating
+  procedures. Add an SOP, browse by category, open one for the full
+  procedure text.
+- **`/people`** (Team Directory) and **`/people/onboarding`** — staff
+  directory plus an onboarding tracker. Adding a team member automatically
+  applies the standard onboarding checklist to them; ticking off every task
+  on their profile (`/people/[id]`) automatically flips their status from
+  Onboarding to Active.
 - **`POST /api/leads/intake`** — webhook for the website enquiry form (or
   Zapier/Make in front of it) to create a new pipeline deal. See
   `src/app/api/leads/intake/route.ts` for the payload shape.
 - **`GET/POST /api/deals`**, **`PATCH/DELETE /api/deals/[id]`** — deal CRUD
   and stage updates, used by the board.
+- **`GET/POST /api/sops`**, **`GET/PATCH/DELETE /api/sops/[id]`** — SOP CRUD.
+- **`GET/POST /api/employees`**, **`PATCH /api/employees/[id]`**,
+  **`PATCH /api/onboarding-tasks/[id]`** — people directory and onboarding
+  checklist endpoints.
 
 Every other sidebar item is a scaffolded placeholder (`ComingSoon`) so the
 navigation matches the target IA without pretending those screens exist yet.
