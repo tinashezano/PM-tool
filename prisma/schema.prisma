@@ -3,12 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite has no native enum support in Prisma; stage/priority/source are
-// plain strings constrained in app code — see src/lib/constants.ts.
+// stage/priority/source are plain strings constrained in app code — see
+// src/lib/constants.ts — rather than native Postgres enums, so adding a
+// new stage/priority value never needs a migration.
 
 model User {
   id        String   @id @default(cuid())

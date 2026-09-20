@@ -17,14 +17,16 @@ webhook, and automatic Client creation when a deal reaches Onboarding).
 ## Stack
 
 - [Next.js](https://nextjs.org) (App Router) + TypeScript + Tailwind CSS
-- [Prisma](https://www.prisma.io) + SQLite for local dev (swap the
-  datasource for Postgres/MySQL when deploying)
+- [Prisma](https://www.prisma.io) + PostgreSQL
 
-## Getting started
+## Getting started (local)
+
+Requires a Postgres instance — a local install, Docker, or a free one from
+your hosting provider.
 
 ```bash
 npm install
-cp .env.example .env
+cp .env.example .env   # then set DATABASE_URL to your Postgres connection string
 npx prisma migrate dev
 npm run db:seed
 npm run dev
@@ -32,6 +34,28 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) — it redirects to
 `/deals`, the pipeline board.
+
+## Deploying (e.g. Railway)
+
+1. **Add a Postgres database** to the project (Railway: "+ New" → Database →
+   PostgreSQL).
+2. **Point the web service at it**: in the web service's Variables tab, add
+   `DATABASE_URL` and set it to a reference to the Postgres service's own
+   `DATABASE_URL` (Railway: "+ New Variable" → "Add Reference" → pick the
+   Postgres service). Don't hardcode a connection string — the reference
+   keeps it in sync if the DB ever moves.
+3. **Deploy.** `npm install` runs `prisma generate` automatically
+   (`postinstall` script), and `npm start` runs `prisma migrate deploy`
+   before `next start` — so every deploy applies any new migrations to the
+   real database first. Nothing else to configure; Next.js reads the
+   platform's `PORT` automatically.
+4. **Seed it once**, if you want the demo pipeline data: run
+   `npm run db:seed` from a one-off Railway shell/job against the deployed
+   `DATABASE_URL` (or leave it empty and create deals from the UI/webhook).
+
+If a deploy shows a generic "server error" page, it's almost always one of:
+`DATABASE_URL` not set on the web service, or migrations never ran (check
+the deploy logs for the `prisma migrate deploy` step).
 
 ## What's working
 
@@ -51,9 +75,9 @@ navigation matches the target IA without pretending those screens exist yet.
 
 ## Data model
 
-See `prisma/schema.prisma`. Enums (`DealStage`, `DealPriority`, `DealSource`)
-are plain strings constrained in `src/lib/constants.ts` — SQLite has no
-native enum support in Prisma.
+See `prisma/schema.prisma`. Stage/priority/source are plain strings
+constrained in `src/lib/constants.ts` rather than native Postgres enums, so
+adding a new value never needs a migration.
 
 ## Next up
 
